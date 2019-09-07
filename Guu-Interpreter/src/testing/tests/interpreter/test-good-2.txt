@@ -1,0 +1,19 @@
+sub fun1
+  set b 5
+  print a
+  call fun2
+
+sub fun2
+  set c 10
+  print b
+  call fun3
+
+sub fun3
+  print c
+
+sub main
+  set a -5
+  call fun1
+  set a 0
+  call fun1
+

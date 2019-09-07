@@ -1,0 +1,5 @@
+sub main
+  set @2
+  3kdwa
+
+  --! 02-!!

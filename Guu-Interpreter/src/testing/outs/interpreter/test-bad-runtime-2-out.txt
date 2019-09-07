@@ -1,0 +1,2 @@
+Line 10. Procedure declaration is duplicated.
+Line 13. Procedure declaration is duplicated.

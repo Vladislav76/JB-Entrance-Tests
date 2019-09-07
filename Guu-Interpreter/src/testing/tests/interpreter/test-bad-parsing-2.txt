@@ -1,0 +1,8 @@
+sub
+
+sub it set 2 2
+
+sub main
+  lal
+  set 2 a
+  set a a

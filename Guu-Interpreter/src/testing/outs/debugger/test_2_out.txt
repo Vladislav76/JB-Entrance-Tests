@@ -1,0 +1,4 @@
+[main] [line:2] call gang
+[gang] [line:6] set a 2
+[gang] [line:7] print a
+[gang] [line:8] call double

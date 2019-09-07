@@ -1,0 +1,8 @@
+sub main
+  set a 2
+  print a
+  call php
+  print b
+
+sub php
+  set b 5

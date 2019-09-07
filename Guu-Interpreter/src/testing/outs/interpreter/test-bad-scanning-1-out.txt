@@ -1,0 +1,4 @@
+Line: 2. Error at @: Unexpected character.
+Line: 5. Error at !: Unexpected character.
+Line: 5. Error at !: Unexpected character.
+Line: 5. Error at !: Unexpected character.

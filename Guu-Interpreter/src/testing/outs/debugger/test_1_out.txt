@@ -1,0 +1,8 @@
+No variables
+No trace
+a: 2
+b: 5
+[main] [line:2] set a 2
+[main] [line:3] print a
+[main] [line:4] call php
+Unknown command

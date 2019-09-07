@@ -1,0 +1,7 @@
+sub main
+  call _bad
+  print 2
+
+sub _bad
+  set 2 b
+  print b

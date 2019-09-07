@@ -1,0 +1,12 @@
+sub main
+  call gang
+  call gang
+
+sub gang
+  set a 2
+  print a
+  call double
+
+sub double
+  print a
+  print a

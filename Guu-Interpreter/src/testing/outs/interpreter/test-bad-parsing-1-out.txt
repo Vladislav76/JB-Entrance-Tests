@@ -1,0 +1,2 @@
+Line: 3. Error at print: Expected variable name.
+Line: 6. Error at set: Expected variable name.

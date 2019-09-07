@@ -1,0 +1,14 @@
+
+
+sub kek
+ print a
+ call _dwa2
+
+sub main
+ set a 2
+ print a
+ set a 3
+ call kek
+
+sub _dwa2
+  set b 5

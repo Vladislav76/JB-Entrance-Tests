@@ -1,0 +1,13 @@
+sub main
+  set a 1
+  print a
+  call _main2
+
+sub _main2
+  call no_exist
+  print a
+
+sub main
+  print a
+
+  sub _main2

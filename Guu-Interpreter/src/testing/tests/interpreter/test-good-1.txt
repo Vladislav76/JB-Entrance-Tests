@@ -1,0 +1,8 @@
+sub proc
+  set b 5
+  print b
+
+sub main
+  set a 2
+  print a
+  call proc

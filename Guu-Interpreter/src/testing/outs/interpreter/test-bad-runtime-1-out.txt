@@ -1,0 +1,3 @@
+a = 2
+a = 2
+Line 8. Undefined variable b.

@@ -1,0 +1,5 @@
+Line: 1. Error at end of line: Expected procedure name.
+Line: 3. Error at set: Statement must be at a new line.
+Line: 6. Error at lal: Unknown statement.
+Line: 7. Error at set: Expected variable name.
+Line: 8. Error at a: Expected number.
