@@ -1,35 +1,34 @@
 package com.example.microphone
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.media.MediaRecorder
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.IOException
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private var isRecordingMode = false
-    private val handler = Handler()
-
-    private val chartUpdating: Runnable = object : Runnable {
-        override fun run() {
-            RecorderHolder.recorder?.let {
-                bar_chart.addValue(it.maxAmplitude)
-                handler.postDelayed(this, 30)
-            }
-        }
-    }
+    private lateinit var receiver: AmplitudeValueReceiver
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         val isAccepted = requestCode == RECORD_AUDIO_PERMISSION_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED
-        if (!isAccepted) finish()
+        if (isAccepted) {
+            isRecordingMode = true
+            updateRecordButtonView()
+            bar_chart.changeConfig(100)
+            startService(RecordService.getIntent(this))
+        } else {
+            Toast.makeText(this, R.string.no_audio_record_permission_message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,66 +46,67 @@ class MainActivity : AppCompatActivity() {
                     stopRecording()
                 } else {
                     startRecording()
-                    handler.post(chartUpdating)
                 }
-                isRecordingMode = !isRecordingMode
-                updateRecordButtonView()
             }
         }
 
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION_REQUEST_CODE)
+        receiver = AmplitudeValueReceiver()
     }
 
     override fun onStart() {
-        if (isRecordingMode) handler.post(chartUpdating)
+        val intentFilter = IntentFilter(RecordService.SEND_AMPLITUDE_VALUES_ACTION)
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
         super.onStart()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        if (isRecordingMode) bar_chart.clear()
         super.onSaveInstanceState(outState)
         outState.putBoolean(IS_RECORDING_MODE_EXTRA, isRecordingMode)
     }
 
     override fun onStop() {
         super.onStop()
-        handler.removeCallbacks(chartUpdating)
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        stopRecording()
     }
 
     private fun startRecording() {
-        RecorderHolder.recorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setOutputFile(getOutputFileName())
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-            try {
-                prepare()
-            } catch (e: IOException) {
-                Log.e(TAG, "'prepare' method is failed")
-            }
-            start()
-            bar_chart.changeConfig(50)
+        if (!isRecordingMode) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_PERMISSION_REQUEST_CODE)
         }
     }
 
     private fun stopRecording() {
-        RecorderHolder.recorder?.apply {
-            stop()
-            release()
-            RecorderHolder.recorder = null
+        if (isRecordingMode) {
+            stopService(RecordService.getIntent(this))
             bar_chart.clear()
+            isRecordingMode = false
+            updateRecordButtonView()
         }
-    }
-
-    private fun getOutputFileName(): String {
-        return "${externalCacheDir!!.absolutePath}/${Date()}.3gp"
     }
 
     private fun updateRecordButtonView() {
         record_button.setText(if (isRecordingMode) R.string.stop_label else R.string.start_label)
     }
 
+    private inner class AmplitudeValueReceiver : BroadcastReceiver() {
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.let {
+                if (isRecordingMode && intent.action == RecordService.SEND_AMPLITUDE_VALUES_ACTION) {
+                    val x = RecordService.getAmplitudeValueExtra(intent)
+                    bar_chart.addValue(x)
+                }
+            }
+        }
+    }
+
     companion object {
-        private const val TAG = "MAIN_ACTIVITY"
         private const val IS_RECORDING_MODE_EXTRA = "is_recording_mode_extra"
         private const val RECORD_AUDIO_PERMISSION_REQUEST_CODE = 1
     }

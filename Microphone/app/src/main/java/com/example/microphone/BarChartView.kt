@@ -21,6 +21,7 @@ class BarChartView(context: Context, attrs: AttributeSet) : View(context, attrs)
 
     fun changeConfig(maxAmount: Int) {
         this.maxAmount = maxAmount
+        maxValue = 0
         clear()
     }
 
@@ -34,7 +35,7 @@ class BarChartView(context: Context, attrs: AttributeSet) : View(context, attrs)
 
         val currentWidth = width - paddingLeft - paddingRight
         val currentHeight = height - paddingTop - paddingBottom
-        val offset = currentWidth.toFloat() / values.size
+        val offset = currentWidth.toFloat() / maxAmount
 
         val borderLeft = (marginLeft + paddingLeft).toFloat()
         val borderRight = borderLeft + currentWidth
@@ -46,8 +47,10 @@ class BarChartView(context: Context, attrs: AttributeSet) : View(context, attrs)
             style = Paint.Style.FILL
         }
 
+        val leftOffset = offset * (maxAmount - values.size)
+
         for ((index, value) in values.withIndex()) {
-            val currentLeft = borderLeft + offset * index
+            val currentLeft = leftOffset + borderLeft + offset * index
             val currentTop = borderBottom - value.toFloat() / maxValue * currentHeight
             val currentRight = currentLeft + offset
             canvas?.drawRect(currentLeft, currentTop, currentRight, borderBottom, paint)
